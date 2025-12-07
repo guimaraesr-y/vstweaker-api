@@ -1,7 +1,7 @@
 # mixer/models.py
 from django.db import models
 from django.utils import timezone
-from manager.services.models import AudioTrack, VSFile
+from manager.models import AudioTrack, VSFile
 
 
 def mix_output_path(instance, filename):

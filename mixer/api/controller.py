@@ -1,7 +1,7 @@
 # mixer/api/controller.py
 from ninja import Router
 from django.shortcuts import get_object_or_404
-from manager.services.models import VSFile, AudioTrack
+from manager.models import VSFile, AudioTrack
 from mixer.models import MixJob, MixTrackConfig
 from mixer.tasks import process_mix_job
 from .schemas import CreateMixIn, MixJobOut

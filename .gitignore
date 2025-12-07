@@ -1,3 +1,5 @@
 .venv
 vs_files/*
 extracted/*
+*.pyc
+__pycache__
