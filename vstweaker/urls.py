@@ -17,11 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from ninja import NinjaAPI
+
 from manager.api.controller import router as vs_router
+from mixer.api.controller import router as mixer_router
 
 
 api = NinjaAPI()
+
 api.add_router("/vs", vs_router)
+api.add_router("/mixer", mixer_router)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

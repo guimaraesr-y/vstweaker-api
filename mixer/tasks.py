@@ -1,59 +1,47 @@
+# mixer/tasks.py
 from celery import shared_task
-from django.utils import timezone
 from django.core.files import File
-import os
-from .models import MixJob, MixTrackSetting
-from .services.mixing_service import MixingService, TrackSetting as TS
 import shutil
+import os
+
+from mixer.models import MixJob, MixTrackConfig
+from mixer.services.mixing_service import MixingService, TrackSetting
+
 
 @shared_task(bind=True)
-def run_mix_job(self, mix_job_id: int):
+def process_mix_job(self, mix_job_id):
     try:
-        mix_job = MixJob.objects.select_related("vs_file").get(id=mix_job_id)
+        mix = MixJob.objects.get(id=mix_job_id)
     except MixJob.DoesNotExist:
-        return {"error": "MixJob not found"}
+        return
 
-    mix_job.status = MixJob.STATUS_PROCESSING
-    mix_job.started_at = timezone.now()
-    mix_job.save(update_fields=["status", "started_at"])
+    if mix.status not in [MixJob.STATUS_PENDING, MixJob.STATUS_ERROR]:
+        return
+
+    mix.mark_processing()
 
     try:
-        # collect track settings
-        settings_qs = mix_job.track_settings.select_related("audio_track").all()
-        track_settings = []
-        for s in settings_qs:
-            audio_path = s.audio_track.file_path  # path in disk from extraction
-            track_settings.append(TS(path=audio_path, volume_db=s.volume_db, pan=s.pan))
+        settings = []
+        for cfg in mix.tracks.all():
+            audio_file_path = cfg.audio_track.file.path
+            settings.append(
+                TrackSetting(
+                    file_path=audio_file_path,
+                    volume_db=cfg.volume_db,
+                    pan=cfg.pan
+                )
+            )
 
-        if not track_settings:
-            raise Exception("No tracks configured for this mix job")
+        service = MixingService()
+        result = service.mix(settings)
 
-        mixing_service = MixingService()
-        result = mixing_service.mix(track_settings)
-
-        # move result to Django FileField storage
         with open(result.output_path, "rb") as f:
-            django_file = File(f)
-            # define filename in storage
-            filename = os.path.basename(result.output_path)
-            mix_job.output_file.save(filename, django_file, save=False)
+            mix.output_file.save(os.path.basename(result.output_path), File(f), save=True)
 
-        mix_job.status = MixJob.STATUS_DONE
-        mix_job.finished_at = timezone.now()
-        mix_job.save(update_fields=["output_file", "status", "finished_at"])
+        mix.mark_done()
 
-        # cleanup temp dir (result.output_path inside temp dir). Remove temp dir.
-        try:
-            temp_dir = os.path.dirname(result.output_path)
-            shutil.rmtree(temp_dir)
-        except Exception:
-            pass
-
-        return {"status": "ok", "mix_job_id": mix_job.id}
+        shutil.rmtree(os.path.dirname(result.output_path), ignore_errors=True)
 
     except Exception as e:
-        mix_job.status = MixJob.STATUS_ERROR
-        mix_job.error_message = str(e)
-        mix_job.finished_at = timezone.now()
-        mix_job.save(update_fields=["status", "error_message", "finished_at"])
-        raise  # re-raise so Celery marks the task as failed
+        mix.mark_error(str(e))
+        raise e
