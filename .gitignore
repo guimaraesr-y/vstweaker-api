@@ -1,5 +1,10 @@
 .venv
+*.sqlite3
+
 vs_files/*
 extracted/*
+audio_tracks/*
+vs_mixes/*
+
 *.pyc
-__pycache__
+__pycache__/**

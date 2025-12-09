@@ -5,7 +5,7 @@ from manager.models import AudioTrack, VSFile
 
 
 def mix_output_path(instance, filename):
-    return f"vs_mixes/{instance.mix_job.id}/{filename}"
+    return f"vs_mixes/{instance.id}/{filename}"
 
 
 class MixJob(models.Model):

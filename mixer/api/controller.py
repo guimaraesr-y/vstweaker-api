@@ -20,7 +20,7 @@ def serialize_mix(mix: MixJob, request):
     }
 
 
-@router.post("/create", response=MixJobOut)
+@router.post("", response=MixJobOut)
 def create_mix(request, payload: CreateMixIn):
     vs = get_object_or_404(VSFile, id=payload.vs_file_id)
 
