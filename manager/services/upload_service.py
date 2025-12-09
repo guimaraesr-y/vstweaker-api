@@ -1,13 +1,18 @@
+from manager.domain.vs_file import VSFileEntity
+from manager.infra.storage import FileStorage
+from manager.repositories.vs_file_repository import VSFileRepository
+
+
+# TODO: Create routine to clear local extracted if using S3
 class UploadService:
-    def __init__(self, storage, repository):
+
+    def __init__(self, storage: FileStorage, repository: VSFileRepository):
         self.storage = storage
         self.repository = repository
 
-    def upload_vs_file(self, file):
-        stored_path = self.storage.save(file.name, file)
+    def upload_vs_file(self, file) -> VSFileEntity:
         entity = self.repository.create(
             name=file.name.split(".")[0],
-            original_filename=file.name,
-            stored_path=stored_path
+            file=file,
         )
-        return entity
+        return VSFileEntity(entity.id, entity.name, entity.zip_file, entity.extracted_path)

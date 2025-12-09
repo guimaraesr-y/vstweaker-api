@@ -1,6 +1,6 @@
 class VSFileEntity:
-    def __init__(self, id, name, original_filename, stored_path):
+    def __init__(self, id, name, zip_file, extracted_path):
         self.id = id
         self.name = name
-        self.original_filename = original_filename
-        self.stored_path = stored_path
+        self.zip_file = zip_file
+        self.extracted_path = extracted_path
