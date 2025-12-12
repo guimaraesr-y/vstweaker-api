@@ -21,3 +21,4 @@ class MixJobOut(Schema):
     status: str
     output_url: str | None = None
     error_message: str | None = None
+    tracks: List[TrackConfigIn]
