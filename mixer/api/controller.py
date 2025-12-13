@@ -2,6 +2,7 @@
 from typing import List
 from ninja import Router
 from django.shortcuts import get_object_or_404
+from manager.api.controller import serialize_track
 from manager.models import VSFile, AudioTrack
 from mixer.models import MixJob, MixTrackConfig
 from mixer.tasks import process_mix_job
@@ -11,7 +12,7 @@ from .schemas import CreateMixIn, MixJobOut
 router = Router()
 
 
-def serialize_mix(mix: MixJob, request, include_tracks=False):
+def serialize_mix(mix: MixJob, request, include_mix_track_configs=False):
     data = {
         "id": mix.id,
         "name": mix.name,
@@ -20,16 +21,16 @@ def serialize_mix(mix: MixJob, request, include_tracks=False):
         "error_message": mix.error_message,
     }
     
-    if include_tracks:
-        data["tracks"] = [
+    if include_mix_track_configs:
+        data["mix_track_configs"] = [
             {
-                "audio_track_id": t.audio_track_id,
+                "id": t.audio_track_id,
                 "volume_db": t.volume_db,
-                "pan": t.pan
+                "pan": t.pan,
+                "track": serialize_track(t.audio_track)
             }
-            for t in mix.tracks.all()
+            for t in mix.tracks.all().select_related("audio_track")
         ]
-    print(data)
     
     return data
 
@@ -82,13 +83,13 @@ def update_mix(request, mix_id: int, payload: CreateMixIn):
     mix.name = payload.name
     mix.save(update_fields=["name"])
 
-    return serialize_mix(mix, request, include_tracks=True)
+    return serialize_mix(mix, request, include_mix_track_configs=True)
 
 
 @router.get("/{mix_id}", response=MixJobOut)
 def get_status(request, mix_id: int):
     mix = get_object_or_404(MixJob, id=mix_id)
-    return serialize_mix(mix, request, include_tracks=True)
+    return serialize_mix(mix, request, include_mix_track_configs=True)
 
 
 @router.get("/{mix_id}/reexport", response=MixJobOut)
@@ -100,4 +101,4 @@ def reexport(request, mix_id: int):
 
     process_mix_job.delay(mix.id)
 
-    return serialize_mix(mix, request, include_tracks=True)
+    return serialize_mix(mix, request, include_mix_track_configs=True)

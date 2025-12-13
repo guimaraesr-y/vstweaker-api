@@ -20,6 +20,10 @@ extract_service = ExtractionService(repository, os.path.join(settings.MEDIA_ROOT
 upload_service = UploadService(storage, repository)
 
 
+def serialize_track(track: AudioTrack) -> AudioTrackSchema:
+    return AudioTrackSchema(**track.__dict__)
+
+
 @router.post("/upload", response=VSFileOut)
 def upload_vs(request, file: UploadedFile = File(...)):
     entity = upload_service.upload_vs_file(file)
