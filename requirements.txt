@@ -1,8 +1,11 @@
-Django>=4.2
+Django>=5.2.9
+django-extensions
 django-ninja
+gunicorn
 pydub>=0.25.1
 celery>=5.2
 redis>=4.0
 rarfile
 python-magic
 audioop-lts
+psycopg2-binary
