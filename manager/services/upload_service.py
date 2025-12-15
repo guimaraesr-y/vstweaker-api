@@ -11,8 +11,7 @@ class UploadService:
         self.repository = repository
 
     def upload_vs_file(self, file) -> VSFileEntity:
-        entity = self.repository.create(
+        return self.repository.create(
             name=file.name.split(".")[0],
             file=file,
         )
-        return VSFileEntity(entity.id, entity.name, entity.zip_file, entity.extracted_path)

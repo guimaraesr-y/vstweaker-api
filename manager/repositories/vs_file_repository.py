@@ -12,7 +12,7 @@ class VSFileRepository:
             name=name,
             zip_file=file,
         )
-        return VSFileEntity(vs.id, vs.name, vs.zip_file.name, vs.extracted_path)
+        return VSFileEntity(vs.id, vs.name, vs.zip_file.path, vs.extracted_path)
 
     def add_track(self, vs_id: int, track_name: str, file_path: str):
         with open(file_path, 'rb') as f:

@@ -33,7 +33,6 @@ class ExtractionService:
                         os.path.join(root, f)
                     )
 
-        vs_file_entity
         self.repository.set_extracted_path(
             entity_id=vs_file_entity.id,
             path=extract_dir

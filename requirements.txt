@@ -9,3 +9,4 @@ rarfile
 python-magic
 audioop-lts
 psycopg2-binary
+python-dotenv
