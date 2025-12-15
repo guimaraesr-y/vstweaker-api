@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.*
+.venv/
+
+# Django
+media/
+static/
+db.sqlite3
+
+# Git
+.git
+.gitignore
+
+# Node (se existir)
+node_modules/
+
+# VS / áudio
+*.wav
+*.mp3
+*.zip
+*.rar
+
+# OS
+.DS_Store
+Thumbs.db
