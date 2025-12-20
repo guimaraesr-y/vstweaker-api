@@ -58,6 +58,7 @@ def get_vs_detail(request, vs_id: int):
     return {
         "id": vs.id,
         "name": vs.name,
+        "zip_file": vs.zip_file,
         "created_at": vs.created_at,
         "tracks": tracks
     }

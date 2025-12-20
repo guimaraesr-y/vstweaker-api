@@ -2,6 +2,7 @@ from datetime import datetime
 from ninja import Schema
 from typing import List
 
+
 class AudioTrackSchema(Schema):
     id: int
     name: str
@@ -17,6 +18,7 @@ class VSFileSchema(Schema):
 class VSFileDetailSchema(Schema):
     id: int
     name: str
+    zip_file: str
     created_at: datetime
     tracks: List[AudioTrackSchema]
 
