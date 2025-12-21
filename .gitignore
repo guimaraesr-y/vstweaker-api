@@ -5,6 +5,7 @@ vs_files/*
 extracted/*
 audio_tracks/*
 vs_mixes/*
+media/
 
 *.pyc
 __pycache__/**
