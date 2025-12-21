@@ -1,5 +1,5 @@
 from ninja import Schema
-from typing import List
+from typing import List, Optional
 
 from manager.api.schemas import AudioTrackSchema
 
@@ -27,6 +27,6 @@ class MixJobOut(Schema):
     id: int
     name: str
     status: str
-    output_url: str | None = None
-    error_message: str | None = None
-    mix_track_configs: List[TrackConfigOut]
+    output_url: Optional[str] = None
+    error_message: Optional[str] = None
+    mix_track_configs: Optional[List[TrackConfigOut]] = None
