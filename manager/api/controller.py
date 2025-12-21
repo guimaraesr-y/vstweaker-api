@@ -1,5 +1,6 @@
 import os
 from typing import List
+from django.shortcuts import get_object_or_404
 from ninja import Router, File
 from ninja.files import UploadedFile
 from django.conf import settings
@@ -52,7 +53,7 @@ def list_vs_tracks(request, vs_id: int):
 # ---------------------------------------------
 @router.get("/{vs_id}", response=VSFileDetailSchema)
 def get_vs_detail(request, vs_id: int):
-    vs = VSFile.objects.get(id=vs_id)
+    vs = get_object_or_404(VSFile, id=vs_id)
     tracks = AudioTrack.objects.filter(vs_file=vs)
 
     return {
@@ -64,9 +65,11 @@ def get_vs_detail(request, vs_id: int):
     }
 
 
-# ---------------------------------------------
-# 4. LISTAR TODAS AS TRACKS DO SISTEMA
-# ---------------------------------------------
-@router.get("/tracks", response=List[AudioTrackSchema])
-def list_all_tracks(request):
-    return AudioTrack.objects.all()
+@router.delete("/{vs_id}")
+def delete_vs(request, vs_id: int):
+    vs = VSFile.objects.get(id=vs_id)
+    vs.delete()
+
+    return {
+        "success": True
+    }
