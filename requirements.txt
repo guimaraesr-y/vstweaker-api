@@ -1,5 +1,6 @@
 Django>=5.2.9
 django-extensions
+django-cors-headers
 django-ninja
 gunicorn
 pydub>=0.25.1

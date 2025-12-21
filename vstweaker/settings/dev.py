@@ -1,3 +1,4 @@
+import os
 from .base import *
 
 DEBUG = True
@@ -29,3 +30,5 @@ DATABASES = {
         "CONN_MAX_AGE": 60,
     }
 }
+
+CORS_ALLOW_ALL_ORIGINS = True
