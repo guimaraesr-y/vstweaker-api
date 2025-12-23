@@ -5,7 +5,7 @@ from manager.api.schemas import AudioTrackSchema
 
 
 class TrackConfigIn(Schema):
-    audio_track_id: int
+    id: int
     volume_db: float = 0.0
     pan: float = 0.0
 
@@ -18,7 +18,7 @@ class TrackConfigOut(Schema):
 
 
 class CreateMixIn(Schema):
-    vs_file_id: int
+    id: int
     name: str
     tracks: List[TrackConfigIn]
 

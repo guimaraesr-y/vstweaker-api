@@ -53,7 +53,7 @@ def list_mixes_by_vs(request, vs_id):
 
 @router.post("", response=MixJobOut)
 def create_mix(request, payload: CreateMixIn):
-    vs = get_object_or_404(VSFile, id=payload.vs_file_id)
+    vs = get_object_or_404(VSFile, id=payload.id)
 
     mix = MixJob.objects.create(
         vs_file=vs,
@@ -61,7 +61,7 @@ def create_mix(request, payload: CreateMixIn):
     )
 
     for t in payload.tracks:
-        track = get_object_or_404(AudioTrack, id=t.audio_track_id)
+        track = get_object_or_404(AudioTrack, id=t.id)
         MixTrackConfig.objects.create(
             mix_job=mix,
             audio_track=track,
