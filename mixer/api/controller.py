@@ -35,6 +35,16 @@ def serialize_mix(mix: MixJob, request, include_mix_track_configs=False):
     return data
 
 
+@router.get("", response=List[MixJobOut])
+def list_mixes(request):
+    return [
+        serialize_mix(mix, request, include_mix_track_configs=True)
+        for mix in MixJob.objects.all().select_related(
+            'vs_file',
+        ).prefetch_related('tracks__audio_track')
+    ]
+
+
 @router.get("/{mix_id}", response=MixJobOut)
 def get_status(request, mix_id: int):
     mix = get_object_or_404(MixJob, id=mix_id)
