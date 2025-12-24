@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'ninja',
     'manager',
     'mixer',
+    'dashboard',
 ]
 
 MIDDLEWARE = [

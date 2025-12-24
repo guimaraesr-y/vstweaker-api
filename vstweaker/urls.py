@@ -20,12 +20,14 @@ from ninja import NinjaAPI
 
 from manager.api.controller import router as vs_router
 from mixer.api.controller import router as mixer_router
+from dashboard.api.controller import router as dashboard_router
 
 
 api = NinjaAPI()
 
 api.add_router("/vs", vs_router)
 api.add_router("/mixer", mixer_router)
+api.add_router("/dashboard", dashboard_router)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
