@@ -13,12 +13,14 @@ class MixJob(models.Model):
     STATUS_PROCESSING = "processing"
     STATUS_DONE = "done"
     STATUS_ERROR = "error"
+    STATUS_EXPIRED = "expired"
 
     STATUS_CHOICES = [
         (STATUS_PENDING, "Pending"),
         (STATUS_PROCESSING, "Processing"),
         (STATUS_DONE, "Done"),
         (STATUS_ERROR, "Error"),
+        (STATUS_EXPIRED, "Expired"),
     ]
 
     vs_file = models.ForeignKey(VSFile, on_delete=models.CASCADE)
@@ -31,22 +33,33 @@ class MixJob(models.Model):
 
     output_file = models.FileField(upload_to=mix_output_path, null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
+    last_downloaded_at = models.DateTimeField(null=True, blank=True)
 
     def mark_processing(self):
         self.status = self.STATUS_PROCESSING
+        self.error_message = None
         self.started_at = timezone.now()
-        self.save()
+        self.save(update_fields=["status", "error_message", "started_at"])
 
     def mark_done(self):
         self.status = self.STATUS_DONE
         self.finished_at = timezone.now()
-        self.save()
+        self.save(update_fields=["status", "finished_at"])
 
     def mark_error(self, msg):
         self.status = self.STATUS_ERROR
         self.error_message = msg
         self.finished_at = timezone.now()
-        self.save()
+        self.save(update_fields=["status", "error_message", "finished_at"])
+
+    def mark_downloaded(self):
+        self.last_downloaded_at = timezone.now()
+        self.save(update_fields=["last_downloaded_at"])
+
+    def delete(self, *args, **kwargs):
+        if self.output_file:
+            self.output_file.delete(save=False)
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return f"MixJob({self.id}) - {self.name}"

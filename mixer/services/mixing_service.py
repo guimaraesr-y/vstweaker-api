@@ -2,6 +2,7 @@
 import os
 import tempfile
 from datetime import datetime
+from django.utils.text import slugify
 from pydub import AudioSegment
 
 
@@ -19,7 +20,7 @@ class MixResult:
 
 class MixingService:
 
-    def mix(self, track_settings, sample_rate=44100, channels=2):
+    def mix(self, track_settings, name="mix", sample_rate=44100, channels=2):
         processed = []
         longest = 0
 
@@ -42,7 +43,9 @@ class MixingService:
             final = final.overlay(seg)
 
         temp_dir = tempfile.mkdtemp(prefix="mix_")
-        filename = f"mix_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}.wav"
+        safe_name = slugify(name)
+        timestamp = datetime.utcnow().strftime('%Y%m%d%H%M%S')
+        filename = f"{safe_name}_{timestamp}.wav"
         output_path = os.path.join(temp_dir, filename)
 
         final.export(output_path, format="wav")
