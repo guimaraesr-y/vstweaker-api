@@ -6,7 +6,6 @@ services:
     container_name: vst_web_dev
     volumes:
       - .:/app
-      - media:/app/media
     ports:
       - "8000:8000"
     env_file:
@@ -39,7 +38,20 @@ services:
     command: celery -A vstweaker worker -l info
     volumes:
       - .:/app
-      - media:/app/media
+    env_file:
+      - .env.dev
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  celery-beat:
+    build:
+      context: .
+      target: dev
+    container_name: vst_beat_dev
+    command: celery -A vstweaker beat -l info
+    volumes:
+      - .:/app
     env_file:
       - .env.dev
     depends_on:
@@ -58,4 +70,3 @@ services:
 
 volumes:
   postgres_dev_data:
-  media:

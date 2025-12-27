@@ -54,6 +54,19 @@ services:
     depends_on:
       - redis
 
+  celery-beat:
+    build:
+      context: .
+      target: prod
+    container_name: vst_beat_prod
+    command: celery -A vstweaker beat -l info
+    env_file:
+      - .env.prod
+    volumes:
+      - media:/app/media
+    depends_on:
+      - redis
+
   redis:
     image: redis:7-alpine
     container_name: vst_redis_prod

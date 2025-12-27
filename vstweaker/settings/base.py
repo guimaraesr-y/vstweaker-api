@@ -130,11 +130,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Celery
-CELERY_BROKER_URL = "redis://localhost:6379/0"
-CELERY_RESULT_BACKEND = "redis://localhost:6379/1"
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    "cleanup-mixes-every-hour": {
+        "task": "mixer.tasks.cleanup_inactive_mix_files",
+        "schedule": crontab(minute=0), # Every hour
+    },
+    "cleanup-vs-tracks-every-hour": {
+        "task": "mixer.tasks.cleanup_inactive_vs_tracks",
+        "schedule": crontab(minute=30), # Every hour at :30
+    },
+}
 
 # Media files
 MEDIA_URL = '/media/'
