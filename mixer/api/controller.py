@@ -13,12 +13,22 @@ router = Router()
 
 
 def serialize_mix(mix: MixJob, request, include_mix_track_configs=False):
+    output_url = None
+    status = mix.status
+
+    if mix.output_file and mix.status == MixJob.STATUS_DONE:
+        if mix.output_file.storage.exists(mix.output_file.name):
+            output_url = request.build_absolute_uri("/media/" + mix.output_file.name)
+        else:
+            status = MixJob.STATUS_EXPIRED
+
     data = {
         "id": mix.id,
         "name": mix.name,
-        "status": mix.status,
-        "output_url": request.build_absolute_uri("/media/" + mix.output_file.name) if mix.output_file else None,
+        "status": status,
+        "output_url": output_url,
         "error_message": mix.error_message,
+        "last_downloaded_at": mix.last_downloaded_at,
     }
 
     if include_mix_track_configs:
@@ -112,3 +122,21 @@ def reexport(request, mix_id: int):
     process_mix_job.delay(mix.id)
 
     return serialize_mix(mix, request, include_mix_track_configs=True)
+
+
+@router.get("/{mix_id}/download")
+def download_mix(request, mix_id: int):
+    mix = get_object_or_404(MixJob, id=mix_id)
+    
+    # If explicitly expired or file missing on disk
+    is_missing = not mix.output_file or not mix.output_file.storage.exists(mix.output_file.name)
+    
+    if mix.status == MixJob.STATUS_EXPIRED or is_missing:
+        # File is missing or expired, regeneration needed
+        mix.status = MixJob.STATUS_PENDING
+        mix.save(update_fields=["status"])
+        process_mix_job.delay(mix.id)
+        return {"detail": "File is being regenerated", "status": mix.status}
+
+    mix.mark_downloaded()
+    return {"url": request.build_absolute_uri("/media/" + mix.output_file.name)}
