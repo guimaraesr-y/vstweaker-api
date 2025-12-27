@@ -1,6 +1,7 @@
 # mixer/api/controller.py
 from typing import List
 from ninja import Router
+from ninja.responses import Response
 from django.shortcuts import get_object_or_404
 from manager.api.controller import serialize_track
 from manager.models import VSFile, AudioTrack
@@ -110,6 +111,14 @@ def update_mix(request, mix_id: int, payload: CreateMixIn):
     mix.save(update_fields=["name"])
 
     return serialize_mix(mix, request, include_mix_track_configs=True)
+
+
+@router.delete("/{mix_id}")
+def delete_mix(request, mix_id: int):
+    mix = get_object_or_404(MixJob, id=mix_id)
+    mix.delete()
+
+    return Response(data=None, status=204)
 
 
 @router.get("/{mix_id}/reexport", response=MixJobOut)
