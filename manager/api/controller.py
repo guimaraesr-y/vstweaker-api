@@ -30,9 +30,7 @@ def serialize_track(track: AudioTrack) -> AudioTrackSchema:
 def upload_vs(request, file: UploadedFile = File(...)):
     entity = upload_service.upload_vs_file(file)
     extract_service.extract(entity)
-    return VSFile.objects.get(id=entity.id).annotate(
-        tracks_count=Count("tracks")
-    )
+    return VSFile.objects.get(id=entity.id)
 
 
 @router.get("/", response=List[VSFileSchema])
@@ -56,8 +54,9 @@ def get_vs_detail(request, vs_id: int):
         "id": vs.id,
         "name": vs.name,
         "zip_file": vs.zip_file,
+        "tracks": tracks,
+        "tracks_count": tracks.count(),
         "created_at": vs.created_at,
-        "tracks": tracks
     }
 
 

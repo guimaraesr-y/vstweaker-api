@@ -20,8 +20,9 @@ class VSFileDetailSchema(Schema):
     id: int
     name: str
     zip_file: str
-    created_at: datetime
     tracks: List[AudioTrackSchema]
+    tracks_count: int
+    created_at: datetime
 
 
 class VSFileOut(Schema):
