@@ -57,6 +57,9 @@ class MixJob(models.Model):
         self.save(update_fields=["last_downloaded_at"])
 
     def delete(self, *args, **kwargs):
+        if self.status == self.STATUS_PROCESSING:
+            raise RuntimeError("Cannot delete a mix that is currently being processed.")
+            
         if self.output_file:
             self.output_file.delete(save=False)
         super().delete(*args, **kwargs)

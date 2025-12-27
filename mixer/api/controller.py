@@ -116,8 +116,15 @@ def update_mix(request, mix_id: int, payload: CreateMixIn):
 @router.delete("/{mix_id}")
 def delete_mix(request, mix_id: int):
     mix = get_object_or_404(MixJob, id=mix_id)
-    mix.delete()
-
+    
+    try:
+        mix.delete()
+    except RuntimeError as e:
+        return Response(
+            {"detail": str(e)}, 
+            status=400
+        )
+        
     return Response(data=None, status=204)
 
 
