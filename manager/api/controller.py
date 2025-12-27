@@ -1,3 +1,4 @@
+from django.db.models.aggregates import Count
 import os
 from typing import List
 from django.shortcuts import get_object_or_404
@@ -29,12 +30,16 @@ def serialize_track(track: AudioTrack) -> AudioTrackSchema:
 def upload_vs(request, file: UploadedFile = File(...)):
     entity = upload_service.upload_vs_file(file)
     extract_service.extract(entity)
-    return VSFile.objects.get(id=entity.id)
+    return VSFile.objects.get(id=entity.id).annotate(
+        tracks_count=Count("tracks")
+    )
 
 
 @router.get("/", response=List[VSFileSchema])
 def list_vs(request):
-    return VSFile.objects.all()
+    return VSFile.objects.all().annotate(
+        tracks_count=Count("tracks")
+    )
 
 
 @router.get("/{vs_id}/tracks", response=List[AudioTrackSchema])

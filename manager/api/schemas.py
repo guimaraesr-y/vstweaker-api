@@ -12,6 +12,7 @@ class AudioTrackSchema(Schema):
 class VSFileSchema(Schema):
     id: int
     name: str
+    tracks_count: int
     created_at: datetime
 
 
@@ -28,4 +29,5 @@ class VSFileOut(Schema):
     name: str
     zip_file: str
     extracted_path: str
+    tracks_count: int
     created_at: datetime
