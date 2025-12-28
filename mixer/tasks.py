@@ -69,9 +69,7 @@ def cleanup_inactive_mix_files():
     affected = 0
     for mix in (mixes_never_downloaded | mixes_inactive).distinct():
         if mix.output_file:
-            mix.output_file.delete(save=False)
-            mix.status = MixJob.STATUS_EXPIRED
-            mix.save(update_fields=["status"])
+            mix.expire_mix()
             affected += 1
     
     return f"Cleaned up {affected} inactive mix files"

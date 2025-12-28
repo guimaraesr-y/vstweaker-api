@@ -56,6 +56,11 @@ class MixJob(models.Model):
         self.last_downloaded_at = timezone.now()
         self.save(update_fields=["last_downloaded_at"])
 
+    def expire_mix(self):
+        self.status = self.STATUS_EXPIRED
+        self.output_file.delete(save=False)
+        self.save(update_fields=["status"])
+
     def delete(self, *args, **kwargs):
         if self.status == self.STATUS_PROCESSING:
             raise RuntimeError("Cannot delete a mix that is currently being processed.")
